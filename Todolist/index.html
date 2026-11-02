@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘의 할일</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // 구형 브라우저에서도 실행되도록 ES5로 작성. 스크립트 오류를 화면에 표시한다.
+    window.addEventListener('error', function (e) {
+      var box = document.getElementById('js-fallback');
+      var detail = document.getElementById('js-error');
+      if (!box || !detail) return;
+      box.hidden = false;
+      detail.hidden = false;
+      detail.textContent = '오류: ' + e.message;
+    });
+  </script>
+</head>
+<body>
+  <main class="app">
+    <!-- JS가 정상 실행되면 app.js가 숨긴다. 미리보기 앱처럼 JS를 실행하지 않는 곳에서는 계속 보인다. -->
+    <div class="notice notice-warn" id="js-fallback">
+      <strong>할일 기능이 실행되지 않았어요.</strong>
+      <p>파일 미리보기나 메신저 안에서 열면 동작하지 않을 수 있어요. Chrome, Safari, 삼성 인터넷 같은 브라우저 앱에서 열어 주세요.</p>
+      <p class="js-error" id="js-error" hidden></p>
+    </div>
+
+    <header class="header">
+      <h1>오늘의 할일</h1>
+      <div class="date-nav">
+        <button type="button" class="icon-btn" id="prev-day" aria-label="이전 날">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <p class="date" id="view-date" aria-live="polite">
+          <span id="view-date-text"></span>
+          <span class="date-badge" id="view-date-badge" hidden></span>
+        </p>
+        <button type="button" class="icon-btn" id="next-day" aria-label="다음 날">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button type="button" class="btn btn-text" id="go-today" hidden>오늘로</button>
+      </div>
+      <div class="progress">
+        <div class="progress-bar" id="progress-bar" role="progressbar" aria-label="진행률"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-text" id="progress-text"></span>
+      </div>
+      <p class="celebrate" id="celebrate" hidden></p>
+    </header>
+
+    <p class="notice" id="storage-notice" hidden>
+      이 브라우저에서는 저장할 수 없어요. 페이지를 닫으면 할일이 사라져요.
+    </p>
+
+    <p class="notice" id="readonly-notice" hidden>지난 날짜는 완료 체크만 할 수 있어요.</p>
+
+    <section class="banner" id="carry-banner" hidden>
+      <span id="carry-text"></span>
+      <div class="banner-actions">
+        <button type="button" class="btn btn-primary" id="carry-accept">가져오기</button>
+        <button type="button" class="btn" id="carry-dismiss">무시</button>
+      </div>
+    </section>
+
+    <form class="todo-form" id="todo-form">
+      <label for="todo-input" class="sr-only">새 할일</label>
+      <input id="todo-input" type="text" maxlength="200" placeholder="할 일을 입력하세요..." autocomplete="off">
+      <button type="submit" class="btn btn-primary">추가</button>
+    </form>
+
+    <nav class="filters" id="filters" aria-label="필터">
+      <button type="button" class="filter" data-filter="all" aria-pressed="true">전체</button>
+      <button type="button" class="filter" data-filter="active" aria-pressed="false">진행중</button>
+      <button type="button" class="filter" data-filter="done" aria-pressed="false">완료</button>
+    </nav>
+
+    <ul class="todo-list" id="todo-list"></ul>
+    <p class="empty" id="empty-state" hidden></p>
+
+    <footer class="footer" id="footer" hidden>
+      <span id="remaining"></span>
+      <button type="button" class="btn btn-text" id="clear-done">완료 항목 지우기</button>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" hidden>
+    <span id="toast-text"></span>
+    <button type="button" class="btn btn-text" id="toast-undo">실행 취소</button>
+  </div>
+
+  <!-- file://로 바로 열 수 있도록 ES Module 대신 순서대로 로드하는 일반 스크립트를 사용 -->
+  <script src="js/date.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

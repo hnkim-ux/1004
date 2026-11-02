@@ -1,0 +1,41 @@
+{
+  "name": "today-todo-widget",
+  "productName": "오늘의 할일",
+  "version": "1.0.0",
+  "description": "오늘의 할일 데스크톱 위젯",
+  "author": "hnkim",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "page": "node ../build.mjs && node scripts/copy-page.mjs",
+    "icon": "node scripts/make-icon.mjs",
+    "start": "npm run page && electron .",
+    "dist": "npm run page && node scripts/dist.mjs"
+  },
+  "build": {
+    "appId": "local.todolist.widget",
+    "productName": "오늘의 할일",
+    "artifactName": "TodayTodo-Setup-${version}.${ext}",
+    "files": [
+      "main.js",
+      "preload.js",
+      "page/**",
+      "assets/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "오늘의 할일"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0"
+  }
+}

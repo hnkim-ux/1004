@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘의 할일 V2</title>
+  <style>
+/* V2: 우주 외계인 테마. 클래스 이름과 구조는 V1과 동일하고 모양만 다르다. */
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+:root {
+  --bg: #0a0f2e;
+  --surface: #161d52;
+  --surface-2: #1f2868;
+  --text: #f1f3ff;
+  --muted: #a8b0e0;
+  --border: #2c367f;
+  --border-strong: #3d49a8;
+  --alien: #8be04e;
+  --alien-light: #b4f483;
+  --alien-deep: #4f9a1f;
+  --alien-glow: rgba(139, 224, 78, 0.35);
+  --accent: var(--alien);
+  --accent-contrast: #0a0f2e;
+  --accent-soft: rgba(139, 224, 78, 0.14);
+  --suit: #8b6cff;
+  --suit-deep: #5b3fd1;
+  --star: #ffd23f;
+  --danger: #ff5d6c;
+  --track: #232b6e;
+  --radius: 18px;
+  --font-fun: 'Jua', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 0 16px 96px;
+  background-color: var(--bg);
+  /* 성운 두 개 + 반복되는 별 */
+  background-image:
+    radial-gradient(circle at 88% -8%, rgba(139, 108, 255, 0.35), transparent 45%),
+    radial-gradient(circle at -10% 108%, rgba(139, 224, 78, 0.16), transparent 42%),
+    radial-gradient(1.5px 1.5px at 25px 35px, rgba(255, 255, 255, 0.85) 50%, transparent 51%),
+    radial-gradient(1px 1px at 120px 80px, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 170px 150px, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 60px 170px, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 190px 20px, rgba(180, 244, 131, 0.7) 50%, transparent 51%);
+  background-size: 100% 100%, 100% 100%, 210px 210px, 210px 210px, 210px 210px, 210px 210px, 210px 210px;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding-top: 32px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--alien);
+  outline-offset: 2px;
+}
+
+[hidden] { display: none !important; }
+
+/* Header */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.mascot {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 14px var(--alien-glow));
+  animation: bob 3.2s ease-in-out infinite;
+}
+
+body[data-mood="happy"] .mascot { animation: hop 0.9s ease-in-out infinite; }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-12px) scale(1.05); }
+}
+
+.header h1 {
+  margin: 0;
+  font-family: var(--font-fun);
+  font-weight: 400;
+  font-size: 2.125rem;
+  line-height: 1.15;
+  text-shadow: 0 3px 0 var(--suit-deep);
+}
+
+.tagline {
+  margin: 4px 0 0;
+  font-family: var(--font-fun);
+  color: var(--alien);
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 14px -8px;
+}
+
+.date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 4px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.date-badge {
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--alien);
+  color: var(--accent-contrast);
+  font-family: var(--font-fun);
+  font-size: 0.875rem;
+}
+
+.date-nav #go-today { margin-left: auto; }
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 14px;
+  background: var(--track);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: repeating-linear-gradient(-45deg, var(--alien) 0 10px, var(--alien-light) 10px 20px);
+  box-shadow: 0 0 12px var(--alien-glow);
+  transition: width 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.progress-text {
+  font-family: var(--font-fun);
+  font-size: 0.9375rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.celebrate {
+  margin: 12px 0 0;
+  font-family: var(--font-fun);
+  font-size: 1.125rem;
+  color: var(--alien);
+  text-shadow: 0 0 12px var(--alien-glow);
+}
+
+/* Notices */
+.notice,
+.banner {
+  margin: 20px 0 0;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+.notice-warn {
+  margin: 0 0 20px;
+  border-color: var(--danger);
+}
+
+.notice-warn p { margin: 4px 0 0; color: var(--muted); }
+
+.js-error {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  background: linear-gradient(135deg, rgba(139, 108, 255, 0.28), rgba(139, 224, 78, 0.12));
+  border: 2px dashed var(--suit);
+}
+
+.banner-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons: 장난감 플라스틱처럼 아래 그림자가 있고 누르면 들어간다 */
+.btn {
+  font-family: var(--font-fun);
+  font-size: 1rem;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  box-shadow: 0 4px 0 #0b1035;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+}
+
+.btn:hover { filter: brightness(1.12); }
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #0b1035;
+}
+
+.btn-primary {
+  background: var(--alien);
+  color: var(--accent-contrast);
+  box-shadow: 0 4px 0 var(--alien-deep);
+}
+
+.btn-primary:active { box-shadow: 0 1px 0 var(--alien-deep); }
+
+.btn-text,
+.btn-text:active {
+  padding: 6px 8px;
+  background: transparent;
+  color: var(--alien);
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-text:hover { filter: none; text-decoration: underline; }
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+  filter: none;
+  text-decoration: none;
+}
+
+/* Form */
+.todo-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.todo-form input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 11px 16px;
+  border: 2px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.todo-form input::placeholder { color: var(--muted); }
+
+.todo-form input:focus-visible {
+  outline: none;
+  border-color: var(--alien);
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 0 18px var(--alien-glow);
+}
+
+.todo-form .btn { padding: 0 20px; }
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 6px;
+  margin: 20px 0 12px;
+}
+
+.filter {
+  font-family: var(--font-fun);
+  font-size: 0.9375rem;
+  padding: 5px 14px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.filter:hover { color: var(--text); border-color: var(--border-strong); }
+
+.filter[aria-pressed="true"] {
+  background: var(--suit);
+  border-color: var(--suit);
+  color: #fff;
+}
+
+/* List: 항목마다 캡슐 카드 */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.todo-list:empty { display: none; }
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 56px;
+  padding: 8px 8px 8px 14px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.todo-item:hover { border-color: var(--border-strong); }
+
+.todo-item.important {
+  border-color: rgba(255, 210, 63, 0.55);
+  box-shadow: 0 0 14px rgba(255, 210, 63, 0.12);
+}
+
+.todo-item.done { background: rgba(22, 29, 82, 0.55); }
+
+.todo-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  margin: 0 4px 0 0;
+  flex-shrink: 0;
+  border: 2.5px solid var(--muted);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.todo-check:hover {
+  border-color: var(--alien);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.todo-check:checked {
+  border-color: var(--alien);
+  background: var(--alien) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0f2e' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 16px no-repeat;
+  box-shadow: 0 0 12px var(--alien-glow);
+}
+
+.todo-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  cursor: text;
+}
+
+.todo-item.done .todo-text {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--alien);
+  text-decoration-thickness: 2px;
+}
+
+.todo-edit {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 4px 10px;
+  border: 2px solid var(--alien);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.todo-edit:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--accent-soft); }
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.icon-btn:hover { background: var(--surface-2); color: var(--text); }
+
+.icon-btn:disabled,
+.icon-btn:disabled:hover { background: transparent; cursor: default; }
+
+.icon-btn svg { width: 19px; height: 19px; }
+
+.star[aria-pressed="true"],
+.star[aria-pressed="true"]:hover {
+  color: var(--star);
+  filter: drop-shadow(0 0 6px rgba(255, 210, 63, 0.6));
+}
+
+.delete:hover { color: var(--danger); }
+
+.todo-item .edit,
+.todo-item .delete { opacity: 0; }
+
+.todo-item:hover .edit,
+.todo-item:hover .delete,
+.todo-item:focus-within .edit,
+.todo-item:focus-within .delete { opacity: 1; }
+
+@media (hover: none) {
+  .todo-item .edit,
+  .todo-item .delete { opacity: 1; }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 16px 32px;
+  text-align: center;
+  background: rgba(22, 29, 82, 0.6);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.empty-mascot {
+  width: 84px;
+  height: 84px;
+  opacity: 0.9;
+  animation: bob 3.2s ease-in-out infinite;
+}
+
+.empty p {
+  margin: 0;
+  font-family: var(--font-fun);
+  font-size: 1.0625rem;
+  color: var(--muted);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 0 4px;
+  font-family: var(--font-fun);
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 10px 10px 10px 18px;
+  border-radius: 14px;
+  background: var(--alien);
+  color: var(--accent-contrast);
+  font-family: var(--font-fun);
+  box-shadow: 0 4px 0 var(--alien-deep), 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+
+.toast .btn-text {
+  color: var(--accent-contrast);
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot,
+  .empty-mascot { animation: none !important; }
+  .progress-fill { transition: none; }
+}
+</style>
+  <script>
+    // 구형 브라우저에서도 실행되도록 ES5로 작성. 스크립트 오류를 화면에 표시한다.
+    window.addEventListener('error', function (e) {
+      var box = document.getElementById('js-fallback');
+      var detail = document.getElementById('js-error');
+      if (!box || !detail) return;
+      box.hidden = false;
+      detail.hidden = false;
+      detail.textContent = '오류: ' + e.message;
+    });
+  </script>
+</head>
+<body>
+  <!-- 마스코트: 눈 셋 달린 초록 외계인 (오리지널 그림). <use href="#alien">으로 재사용 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="alien" viewBox="0 0 120 120">
+      <path d="M60 34V15" stroke="#8be04e" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="60" cy="12" r="7" fill="#c8ff8f"/>
+      <path d="M26 120c0-22 14-31 34-31s34 9 34 31z" fill="#8b6cff"/>
+      <path d="M44 93q16 8 32 0" stroke="#5b3fd1" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="60" cy="60" rx="38" ry="33" fill="#8be04e"/>
+      <ellipse cx="48" cy="40" rx="13" ry="6" fill="#b4f483" opacity=".75"/>
+      <circle cx="39" cy="61" r="10" fill="#fff"/>
+      <circle cx="60" cy="54" r="11.5" fill="#fff"/>
+      <circle cx="81" cy="61" r="10" fill="#fff"/>
+      <circle cx="40.5" cy="62.5" r="4.6" fill="#141a3a"/>
+      <circle cx="61.5" cy="56" r="5.2" fill="#141a3a"/>
+      <circle cx="82.5" cy="62.5" r="4.6" fill="#141a3a"/>
+      <circle cx="42" cy="60.5" r="1.5" fill="#fff"/>
+      <circle cx="63.3" cy="53.8" r="1.7" fill="#fff"/>
+      <circle cx="84" cy="60.5" r="1.5" fill="#fff"/>
+      <path d="M50 78q10 8 20 0" stroke="#2f6b10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+
+  <main class="app">
+    <!-- JS가 정상 실행되면 app.js가 숨긴다. 미리보기 앱처럼 JS를 실행하지 않는 곳에서는 계속 보인다. -->
+    <div class="notice notice-warn" id="js-fallback">
+      <strong>할일 기능이 실행되지 않았어요.</strong>
+      <p>파일 미리보기나 메신저 안에서 열면 동작하지 않을 수 있어요. Chrome, Safari, 삼성 인터넷 같은 브라우저 앱에서 열어 주세요.</p>
+      <p class="js-error" id="js-error" hidden></p>
+    </div>
+
+    <header class="header">
+      <div class="hero">
+        <svg class="mascot" aria-hidden="true"><use href="#alien"/></svg>
+        <div>
+          <h1>오늘의 할일</h1>
+          <p class="tagline">우주 임무 관제실</p>
+        </div>
+      </div>
+      <div class="date-nav">
+        <button type="button" class="icon-btn" id="prev-day" aria-label="이전 날">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <p class="date" id="view-date" aria-live="polite">
+          <span id="view-date-text"></span>
+          <span class="date-badge" id="view-date-badge" hidden></span>
+        </p>
+        <button type="button" class="icon-btn" id="next-day" aria-label="다음 날">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button type="button" class="btn btn-text" id="go-today" hidden>오늘로</button>
+      </div>
+      <div class="progress">
+        <div class="progress-bar" id="progress-bar" role="progressbar" aria-label="진행률"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-text" id="progress-text"></span>
+      </div>
+      <p class="celebrate" id="celebrate" hidden></p>
+    </header>
+
+    <p class="notice" id="storage-notice" hidden>
+      이 브라우저에서는 저장할 수 없어요. 페이지를 닫으면 할일이 사라져요.
+    </p>
+
+    <p class="notice" id="readonly-notice" hidden>지난 날짜는 완료 체크만 할 수 있어요.</p>
+
+    <section class="banner" id="carry-banner" hidden>
+      <span id="carry-text"></span>
+      <div class="banner-actions">
+        <button type="button" class="btn btn-primary" id="carry-accept">가져오기</button>
+        <button type="button" class="btn" id="carry-dismiss">무시</button>
+      </div>
+    </section>
+
+    <form class="todo-form" id="todo-form">
+      <label for="todo-input" class="sr-only">새 할일</label>
+      <input id="todo-input" type="text" maxlength="200" placeholder="오늘의 임무를 입력하세요..." autocomplete="off">
+      <button type="submit" class="btn btn-primary">추가</button>
+    </form>
+
+    <nav class="filters" id="filters" aria-label="필터">
+      <button type="button" class="filter" data-filter="all" aria-pressed="true">전체</button>
+      <button type="button" class="filter" data-filter="active" aria-pressed="false">진행중</button>
+      <button type="button" class="filter" data-filter="done" aria-pressed="false">완료</button>
+    </nav>
+
+    <ul class="todo-list" id="todo-list"></ul>
+    <div class="empty" id="empty-state" hidden>
+      <svg class="empty-mascot" aria-hidden="true"><use href="#alien"/></svg>
+      <p id="empty-text"></p>
+    </div>
+
+    <footer class="footer" id="footer" hidden>
+      <span id="remaining"></span>
+      <button type="button" class="btn btn-text" id="clear-done">완료 항목 지우기</button>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" hidden>
+    <span id="toast-text"></span>
+    <button type="button" class="btn btn-text" id="toast-undo">실행 취소</button>
+  </div>
+  <script>
+// 로컬 시간 기준 날짜 유틸. toISOString()은 UTC라서 사용하지 않는다.
+(function (TD) {
+  const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+  function pad(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  // Date → "YYYY-MM-DD"
+  function toKey(d) {
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  function today() {
+    return toKey(new Date());
+  }
+
+  // "YYYY-MM-DD" → "2026년 11월 2일 (월)"
+  function format(key) {
+    const d = fromKey(key);
+    return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${DAYS[d.getDay()]})`;
+  }
+
+  function fromKey(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  // "YYYY-MM-DD"에서 n일 이동
+  function addDays(key, n) {
+    const d = fromKey(key);
+    d.setDate(d.getDate() + n);
+    return toKey(d);
+  }
+
+  // 오늘 기준 상대 이름: "오늘" / "내일" / "어제" / ''
+  function relative(key) {
+    const t = today();
+    if (key === t) return '오늘';
+    if (key === addDays(t, 1)) return '내일';
+    if (key === addDays(t, -1)) return '어제';
+    return '';
+  }
+
+  TD.date = { toKey, today, format, addDays, relative };
+})(window.TD = window.TD || {});
+</script>
+  <script>
+// 상태 관리 + localStorage 입출력. 상태 변경은 이 모듈의 함수로만 한다.
+(function (TD) {
+  const KEYS = {
+    todos: 'todolist:v1:todos',
+    lastOpened: 'todolist:v1:lastOpenedDate',
+    filter: 'todolist:v1:filter',
+  };
+  const FILTERS = ['all', 'active', 'done'];
+  const MAX_LENGTH = 200;
+
+  let todos = [];
+  let filter = 'all';
+  let lastOpened = null; // 이월 배너를 마지막으로 처리한 날짜
+  let viewDate = null; // 화면에 보고 있는 날짜. 저장하지 않고 항상 오늘로 시작
+  let persistent = true;
+  const listeners = new Set();
+
+  function storageAvailable() {
+    try {
+      const key = 'todolist:v1:__test';
+      localStorage.setItem(key, '1');
+      localStorage.removeItem(key);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function read(key) {
+    if (!persistent) return null;
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function write(key, value) {
+    if (!persistent) return;
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      persistent = false;
+    }
+  }
+
+  function normalize(t) {
+    const todo = {
+      id: t.id,
+      text: String(t.text).slice(0, MAX_LENGTH),
+      done: !!t.done,
+      important: !!t.important,
+      date: t.date,
+      createdAt: Number(t.createdAt) || Date.now(),
+      order: Number(t.order) || 0,
+    };
+    if (todo.done && t.completedAt) todo.completedAt = Number(t.completedAt);
+    return todo;
+  }
+
+  function isValid(t) {
+    return t && typeof t.id === 'string' && typeof t.text === 'string' &&
+      /^\d{4}-\d{2}-\d{2}$/.test(t.date);
+  }
+
+  function load() {
+    todos = [];
+    const raw = read(KEYS.todos);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) throw new Error('todos is not an array');
+        todos = parsed.filter(isValid).map(normalize);
+      } catch (e) {
+        // 손상된 원본은 백업해 두고 빈 목록으로 시작
+        write(KEYS.todos + ':backup', raw);
+      }
+    }
+    const savedFilter = read(KEYS.filter);
+    filter = FILTERS.includes(savedFilter) ? savedFilter : 'all';
+    lastOpened = read(KEYS.lastOpened);
+  }
+
+  function save() {
+    write(KEYS.todos, JSON.stringify(todos));
+  }
+
+  function emit() {
+    listeners.forEach((fn) => fn());
+  }
+
+  function commit() {
+    save();
+    emit();
+  }
+
+  function newId() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  function cleanText(text) {
+    return String(text).trim().slice(0, MAX_LENGTH);
+  }
+
+  function nextOrder(date) {
+    return todos
+      .filter((t) => t.date === date)
+      .reduce((max, t) => Math.max(max, t.order), 0) + 1;
+  }
+
+  function find(id) {
+    return todos.find((t) => t.id === id);
+  }
+
+  // 지난 날짜는 완료 체크만 가능. 그 외 변경은 오늘과 미래 날짜만 할 수 있다.
+  function isEditableDate(date) {
+    return date >= TD.date.today();
+  }
+
+  function findEditable(id) {
+    const t = find(id);
+    return t && isEditableDate(t.date) ? t : null;
+  }
+
+  // 중요 항목 우선, 그다음 order. 완료 여부로는 재정렬하지 않는다.
+  function compare(a, b) {
+    if (a.important !== b.important) return a.important ? -1 : 1;
+    return a.order - b.order;
+  }
+
+  function add(text) {
+    const clean = cleanText(text);
+    if (!clean || !isEditableDate(viewDate)) return null;
+    const todo = {
+      id: newId(),
+      text: clean,
+      done: false,
+      important: false,
+      date: viewDate,
+      createdAt: Date.now(),
+      order: nextOrder(viewDate),
+    };
+    todos.push(todo);
+    commit();
+    return todo;
+  }
+
+  function toggle(id) {
+    const t = find(id);
+    if (!t) return;
+    t.done = !t.done;
+    if (t.done) t.completedAt = Date.now();
+    else delete t.completedAt;
+    commit();
+  }
+
+  function toggleImportant(id) {
+    const t = findEditable(id);
+    if (!t) return;
+    t.important = !t.important;
+    commit();
+  }
+
+  function update(id, text) {
+    const t = findEditable(id);
+    const clean = cleanText(text);
+    if (!t || !clean) return false;
+    t.text = clean;
+    commit();
+    return true;
+  }
+
+  function remove(id) {
+    const index = todos.findIndex((t) => t.id === id);
+    if (index < 0 || !isEditableDate(todos[index].date)) return null;
+    const [removed] = todos.splice(index, 1);
+    commit();
+    return removed;
+  }
+
+  // 실행 취소용: 삭제했던 항목을 원래 date/order 그대로 되돌린다.
+  function restore(items) {
+    items.forEach((item) => {
+      if (!find(item.id)) todos.push(item);
+    });
+    commit();
+  }
+
+  function clearDone() {
+    if (!isEditableDate(viewDate)) return [];
+    const removed = todos.filter((t) => t.date === viewDate && t.done);
+    todos = todos.filter((t) => !(t.date === viewDate && t.done));
+    commit();
+    return removed;
+  }
+
+  function getDayList() {
+    return todos.filter((t) => t.date === viewDate).sort(compare);
+  }
+
+  function getVisible() {
+    const list = getDayList();
+    if (filter === 'active') return list.filter((t) => !t.done);
+    if (filter === 'done') return list.filter((t) => t.done);
+    return list;
+  }
+
+  function getStats() {
+    const list = getDayList();
+    const done = list.filter((t) => t.done).length;
+    return { total: list.length, done, remaining: list.length - done };
+  }
+
+  // 오늘 아직 배너를 처리하지 않았다면, 지난 날짜의 미완료 항목
+  function getCarryOver() {
+    const today = TD.date.today();
+    if (lastOpened === today) return [];
+    return todos.filter((t) => t.date < today && !t.done);
+  }
+
+  function markOpened(date) {
+    lastOpened = date;
+    write(KEYS.lastOpened, date);
+  }
+
+  // 미완료 항목을 오늘로 "이동"한다.
+  function carryOver() {
+    const today = TD.date.today();
+    const items = getCarryOver().sort((a, b) => a.date.localeCompare(b.date) || compare(a, b));
+    let order = nextOrder(today);
+    items.forEach((t) => {
+      t.date = today;
+      t.order = order++;
+    });
+    markOpened(today);
+    commit();
+  }
+
+  function dismissCarryOver() {
+    markOpened(TD.date.today());
+    emit();
+  }
+
+  function setFilter(next) {
+    if (!FILTERS.includes(next) || next === filter) return;
+    filter = next;
+    write(KEYS.filter, next);
+    emit();
+  }
+
+  function setViewDate(date) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date === viewDate) return;
+    viewDate = date;
+    emit();
+  }
+
+  function shiftViewDate(n) {
+    setViewDate(TD.date.addDays(viewDate, n));
+  }
+
+  function subscribe(fn) {
+    listeners.add(fn);
+    return () => listeners.delete(fn);
+  }
+
+  function init() {
+    persistent = storageAvailable();
+    viewDate = TD.date.today();
+    load();
+    if (persistent) {
+      // 다른 탭에서 바뀐 내용을 반영
+      window.addEventListener('storage', (e) => {
+        if (e.key === null || e.key.startsWith('todolist:v1:')) {
+          load();
+          emit();
+        }
+      });
+    }
+  }
+
+  TD.store = {
+    MAX_LENGTH,
+    init,
+    subscribe,
+    add,
+    toggle,
+    toggleImportant,
+    update,
+    remove,
+    restore,
+    clearDone,
+    carryOver,
+    dismissCarryOver,
+    setFilter,
+    setViewDate,
+    shiftViewDate,
+    getViewDate: () => viewDate,
+    isReadOnly: () => !isEditableDate(viewDate),
+    getFilter: () => filter,
+    getVisible,
+    getStats,
+    getCarryOver,
+    isPersistent: () => persistent,
+  };
+})(window.TD = window.TD || {});
+</script>
+  <script>
+// 상태를 읽어 DOM을 그린다. 상태를 바꾸지 않는다.
+(function (TD) {
+  const $ = (id) => document.getElementById(id);
+
+  const SVG_ATTRS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  const ICONS = {
+    star: (filled) =>
+      `<svg ${SVG_ATTRS}><path fill="${filled ? 'currentColor' : 'none'}" d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>`,
+    edit: `<svg ${SVG_ATTRS}><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>`,
+    trash: `<svg ${SVG_ATTRS}><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>`,
+  };
+
+  const EMPTY = {
+    active: '남은 임무가 없어요. 임무 완수!',
+    done: '아직 완수한 임무가 없어요',
+  };
+
+  // 해당 날짜에 할일이 하나도 없을 때의 안내
+  function emptyDayText(date, today) {
+    if (date === today) return '임무 대기 중… 오늘 할 일을 알려 주세요!';
+    if (date > today) return '미래의 임무를 미리 등록해 두세요';
+    return '이 날은 기록된 임무가 없어요';
+  }
+
+  function button(className, label, html, pressed) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `icon-btn ${className}`;
+    btn.setAttribute('aria-label', label);
+    if (pressed !== undefined) btn.setAttribute('aria-pressed', String(pressed));
+    btn.innerHTML = html;
+    return btn;
+  }
+
+  function renderItem(todo, editing, readOnly) {
+    const li = document.createElement('li');
+    li.className = 'todo-item';
+    li.classList.toggle('done', todo.done);
+    li.classList.toggle('important', todo.important);
+    li.dataset.id = todo.id;
+
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.className = 'todo-check';
+    check.checked = todo.done;
+    check.setAttribute('aria-label', `"${todo.text}" 완료`);
+
+    const star = button('star', '중요 표시', ICONS.star(todo.important), todo.important);
+    star.disabled = readOnly;
+
+    let body;
+    if (editing) {
+      body = document.createElement('input');
+      body.type = 'text';
+      body.className = 'todo-edit';
+      body.value = todo.text;
+      body.maxLength = TD.store.MAX_LENGTH;
+      body.setAttribute('aria-label', '할일 수정');
+    } else {
+      body = document.createElement('span');
+      body.className = 'todo-text';
+      body.textContent = todo.text;
+      if (!readOnly) body.title = '더블클릭하여 수정';
+    }
+
+    li.append(check, star, body);
+    if (!readOnly) {
+      li.append(
+        button('edit', `"${todo.text}" 수정`, ICONS.edit),
+        button('delete', `"${todo.text}" 삭제`, ICONS.trash)
+      );
+    }
+    return li;
+  }
+
+  function render(ui) {
+    const store = TD.store;
+    const stats = store.getStats();
+    const filter = store.getFilter();
+    const visible = store.getVisible();
+    const today = TD.date.today();
+    const viewDate = store.getViewDate();
+    const isToday = viewDate === today;
+    const readOnly = store.isReadOnly();
+    const rel = TD.date.relative(viewDate);
+
+    $('view-date-text').textContent = TD.date.format(viewDate);
+    $('view-date-badge').textContent = rel;
+    $('view-date-badge').hidden = !rel;
+    $('go-today').hidden = isToday;
+
+    const pct = stats.total ? Math.round((stats.done / stats.total) * 100) : 0;
+    $('progress-fill').style.width = `${pct}%`;
+    $('progress-bar').setAttribute('aria-valuenow', String(pct));
+    $('progress-text').textContent = `${stats.done} / ${stats.total} 임무 완료`;
+    $('celebrate').hidden = !(stats.total > 0 && stats.remaining === 0);
+    $('celebrate').textContent = isToday
+      ? '🛸 오늘의 임무를 모두 완수했어요!'
+      : '🛸 이 날의 임무를 모두 완수했어요!';
+    document.body.dataset.mood = stats.total > 0 && stats.remaining === 0 ? 'happy' : 'idle';
+
+    $('storage-notice').hidden = store.isPersistent();
+    $('readonly-notice').hidden = !readOnly;
+    $('todo-form').hidden = readOnly;
+    $('todo-input').placeholder = rel && !isToday
+      ? `${rel}의 임무를 입력하세요...`
+      : '오늘의 임무를 입력하세요...';
+
+    const carry = isToday ? store.getCarryOver() : [];
+    $('carry-banner').hidden = carry.length === 0;
+    $('carry-text').textContent = `지난날 못 끝낸 임무 ${carry.length}개를 오늘로 가져올까요?`;
+
+    document.querySelectorAll('.filter').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.filter === filter));
+    });
+
+    // replaceChildren은 구형 모바일 브라우저(Safari 14 미만 등)에 없어서 사용하지 않는다
+    const list = $('todo-list');
+    list.textContent = '';
+    visible.forEach((t) => {
+      list.appendChild(renderItem(t, !readOnly && t.id === ui.editingId, readOnly));
+    });
+
+    const empty = $('empty-state');
+    empty.hidden = visible.length > 0;
+    $('empty-text').textContent = stats.total === 0 ? emptyDayText(viewDate, today) : EMPTY[filter];
+
+    $('footer').hidden = stats.total === 0;
+    $('remaining').textContent = readOnly
+      ? `못 끝낸 임무 ${stats.remaining}개`
+      : `남은 임무 ${stats.remaining}개`;
+    $('clear-done').hidden = readOnly;
+    $('clear-done').disabled = stats.done === 0;
+  }
+
+  TD.render = render;
+})(window.TD = window.TD || {});
+</script>
+  <script>
+// 진입점: 이벤트를 store 함수 호출로 연결하고 다시 그린다.
+(function (TD) {
+  const store = TD.store;
+  const $ = (id) => document.getElementById(id);
+
+  const ui = { editingId: null };
+  const TOAST_MS = 5000;
+  let toastTimer = null;
+  let undoItems = null;
+  let currentDay = null;
+
+  function rerender() {
+    TD.render(ui);
+    if (ui.editingId) {
+      const input = document.querySelector('.todo-edit');
+      if (input && document.activeElement !== input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }
+  }
+
+  function itemId(el) {
+    const li = el.closest('.todo-item');
+    return li ? li.dataset.id : null;
+  }
+
+  function focusItemButton(id, selector) {
+    const btn = document.querySelector(`.todo-item[data-id="${id}"] ${selector}`);
+    if (btn) btn.focus();
+  }
+
+  // ---- 토스트 / 실행 취소 ----
+  function showToast(text, items) {
+    undoItems = items;
+    $('toast-text').textContent = text;
+    $('toast').hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, TOAST_MS);
+  }
+
+  function hideToast() {
+    clearTimeout(toastTimer);
+    undoItems = null;
+    $('toast').hidden = true;
+  }
+
+  function deleteWithUndo(id) {
+    const removed = store.remove(id);
+    if (!removed) return;
+    showToast('임무를 삭제했어요', [removed]);
+    $('todo-input').focus();
+  }
+
+  // ---- 인라인 수정 ----
+  function startEdit(id) {
+    if (store.isReadOnly()) return;
+    ui.editingId = id;
+    rerender();
+  }
+
+  function finishEdit(save) {
+    const id = ui.editingId;
+    if (!id) return;
+    const input = document.querySelector('.todo-edit');
+    const value = input ? input.value.trim() : '';
+    // confirm 중 blur가 다시 들어와도 무시되도록 먼저 해제
+    ui.editingId = null;
+
+    if (save && !value) {
+      if (confirm('내용이 비어 있어요. 이 할일을 삭제할까요?')) {
+        deleteWithUndo(id);
+        return;
+      }
+    } else if (save) {
+      store.update(id, value);
+    }
+    rerender();
+    focusItemButton(id, '.edit');
+  }
+
+  // ---- 날짜 변경 감지 (자정을 넘겨 열어둔 경우) ----
+  function checkDayChange() {
+    const day = TD.date.today();
+    if (day !== currentDay) {
+      // 어제의 "오늘"을 보고 있었다면 새 오늘로 따라간다
+      const wasViewingToday = store.getViewDate() === currentDay;
+      currentDay = day;
+      if (wasViewingToday) store.setViewDate(day);
+      rerender();
+    }
+  }
+
+  function bindEvents() {
+    $('todo-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = $('todo-input');
+      if (store.add(input.value)) {
+        input.value = '';
+        if (store.getFilter() === 'done') store.setFilter('all');
+      }
+      input.focus();
+    });
+
+    const list = $('todo-list');
+
+    list.addEventListener('change', (e) => {
+      if (e.target.classList.contains('todo-check')) {
+        const id = itemId(e.target);
+        store.toggle(id);
+        focusItemButton(id, '.todo-check');
+      }
+    });
+
+    list.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const id = itemId(btn);
+      if (btn.classList.contains('star')) {
+        store.toggleImportant(id);
+        focusItemButton(id, '.star');
+      } else if (btn.classList.contains('edit')) {
+        startEdit(id);
+      } else if (btn.classList.contains('delete')) {
+        deleteWithUndo(id);
+      }
+    });
+
+    list.addEventListener('dblclick', (e) => {
+      if (e.target.classList.contains('todo-text')) startEdit(itemId(e.target));
+    });
+
+    list.addEventListener('keydown', (e) => {
+      if (!e.target.classList.contains('todo-edit') || e.isComposing) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        finishEdit(true);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        finishEdit(false);
+      }
+    });
+
+    list.addEventListener('focusout', (e) => {
+      if (e.target.classList.contains('todo-edit')) finishEdit(true);
+    });
+
+    $('filters').addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter');
+      if (btn) store.setFilter(btn.dataset.filter);
+    });
+
+    $('clear-done').addEventListener('click', () => {
+      const { done } = store.getStats();
+      if (done && confirm(`완료한 할일 ${done}개를 지울까요?`)) store.clearDone();
+    });
+
+    $('prev-day').addEventListener('click', () => store.shiftViewDate(-1));
+    $('next-day').addEventListener('click', () => store.shiftViewDate(1));
+    $('go-today').addEventListener('click', () => {
+      store.setViewDate(TD.date.today());
+      $('next-day').focus();
+    });
+
+    $('carry-accept').addEventListener('click', () => store.carryOver());
+    $('carry-dismiss').addEventListener('click', () => store.dismissCarryOver());
+
+    $('toast-undo').addEventListener('click', () => {
+      if (undoItems) store.restore(undoItems);
+      hideToast();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) checkDayChange();
+    });
+    window.addEventListener('focus', checkDayChange);
+    setInterval(checkDayChange, 60 * 1000);
+  }
+
+  store.init();
+  store.subscribe(rerender);
+  bindEvents();
+  currentDay = TD.date.today();
+  rerender();
+  $('js-fallback').hidden = true;
+})(window.TD = window.TD || {});
+</script>
+</body>
+</html>

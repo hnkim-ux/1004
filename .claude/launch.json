@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "todolist",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5173", "--directory", "todolist"],
+      "port": 5173
+    },
+    {
+      "name": "todolist-v2",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5174", "--directory", "C:/work/todolist-v2"],
+      "port": 5174
+    }
+  ]
+}
