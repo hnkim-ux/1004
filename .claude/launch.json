@@ -12,6 +12,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "5174", "--directory", "C:/work/todolist-v2"],
       "port": 5174
+    },
+    {
+      "name": "demoport",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5175", "--directory", "C:/work/DemoPort"],
+      "port": 5175
     }
   ]
 }
