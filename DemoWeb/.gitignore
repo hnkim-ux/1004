@@ -1,0 +1,21 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next/
+/out/
+/build
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# env files
+.env*
+
+# runtime data (seeded automatically on first run)
+/data/
+
+# misc
+.DS_Store
+npm-debug.log*
