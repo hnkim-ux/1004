@@ -2,3 +2,14 @@ node_modules/
 release/
 *.exe
 .next/
+build/
+dist/
+
+# 크롤링 결과 파일
+naver_news*.csv
+naver_news*.xlsx
+kospi200_*.csv
+kospi200_*.xlsx
+
+# 엑셀이 파일을 열 때 만드는 임시 잠금 파일
+~$*
