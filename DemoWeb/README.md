@@ -26,21 +26,24 @@ npm run lint
 
 `C:\work\.claude\launch.json`의 `demoweb` 항목으로 Claude 미리보기에서도 띄울 수 있습니다.
 
-## 저장소: 로컬 JSON 파일
+## 저장소: Neon PostgreSQL
 
-데이터는 `data/db.json` 한 파일에 저장합니다. 파일이 없으면 첫 요청 때 샘플 게시글 23개와 댓글 몇 개로 자동 생성됩니다(`src/lib/seed.ts`). 초기 상태로 되돌리려면 서버를 끄고 `data/` 폴더를 지우면 됩니다. 실행 중에 생기는 데이터이므로 `data/`는 `.gitignore`로 커밋에서 제외합니다.
+데이터는 [Neon](https://neon.tech) 서버리스 PostgreSQL에 저장합니다. 드라이버는 `@neondatabase/serverless`(HTTP 방식)를 쓰고, 데이터 접근은 모두 `src/lib/db.ts`에 모여 있습니다.
 
-### SQLite 대신 JSON 파일을 고른 이유
+### 설정
 
-- **설치 의존성 없음**: `better-sqlite3` 같은 SQLite 드라이버는 네이티브 모듈이라 Windows에서 Node 버전에 맞는 바이너리가 없으면 빌드 도구(Visual Studio Build Tools, Python)가 필요합니다. JSON 파일은 Node 기본 `fs`만 씁니다.
-- **눈으로 확인 가능**: QA·디버깅할 때 `data/db.json`을 열어 바로 상태를 보고, 직접 고쳐서 경계값(긴 제목, 빈 목록 등)을 재현하기 쉽습니다.
-- **규모에 충분**: 데모 게시판 수준의 데이터(수백~수천 건)는 매 요청마다 파일 전체를 읽어도 문제가 없습니다.
+`.env.example`을 `.env.local`로 복사하고 Neon 대시보드의 연결 문자열을 넣습니다. `.env.local`은 `.gitignore`로 커밋에서 제외됩니다.
 
-### 안전장치와 한계
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DBNAME?sslmode=require"
+```
 
-- 모든 쓰기는 하나의 큐로 직렬화해서, 동시에 요청이 와도 read-modify-write가 서로 덮어쓰지 않습니다(`src/lib/db.ts`의 `mutate`).
-- 임시 파일에 먼저 쓰고 `rename`으로 교체해서, 쓰는 도중 프로세스가 죽어도 파일이 반쯤 깨지지 않습니다.
-- 단일 Node 프로세스 기준입니다. 서버를 여러 대 띄우거나, Vercel 같은 서버리스(읽기 전용 파일 시스템) 환경에 배포하려면 SQLite/PostgreSQL 등으로 바꿔야 합니다. 데이터 접근은 `src/lib/db.ts`에만 모여 있어 이 파일만 교체하면 됩니다.
+### 테이블과 샘플 데이터
+
+- `posts`(id, title, content, author, created_at, updated_at)
+- `comments`(id, post_id → posts.id `ON DELETE CASCADE`, author, content, created_at)
+
+서버가 첫 요청을 받을 때 `posts` 테이블이 없으면 두 테이블을 만들고 샘플 게시글 23개와 댓글 4개(`src/lib/seed.ts`)를 넣습니다. 테이블이 이미 있으면 게시글이 0건이어도 다시 넣지 않습니다. 초기 상태로 되돌리려면 Neon SQL 편집기에서 `DROP TABLE comments, posts;`를 실행한 뒤 페이지를 새로 고치면 됩니다.
 
 ## 구조
 
@@ -58,7 +61,7 @@ src/
     comment-section.tsx      댓글 목록·작성·삭제
     pagination.tsx, site-header.tsx, theme-toggle.tsx …
   lib/
-    db.ts                    JSON 파일 저장소
+    db.ts                    Neon PostgreSQL 데이터 접근
     seed.ts                  초기 샘플 데이터
 ```
 
